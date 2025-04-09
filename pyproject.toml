@@ -1,0 +1,21 @@
+[project]
+name = "stython"
+version = "0.0.1a"
+authors = [
+    { name = "Dustin Thomas", email = "io@cptlobster.dev" }
+]
+
+description = "Helper and preprocessor for dynamically enforcing strong and static typing."
+readme = "README.md"
+requires-python = ">= 3.5"
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent"
+]
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE.md"]
+
+[build-system]
+requires = ["setuptools >= 77.0.3"]
+build-backend = "setuptools.build_meta"
