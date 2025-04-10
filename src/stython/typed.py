@@ -1,4 +1,7 @@
+from typing import Optional
+from warnings import warn
 
+from stython.checker import _isinstance
 
 class Typed:
     """Transparent wrapper class for statically typed variables. Ensures that variable type cannot be changed after
@@ -7,18 +10,25 @@ class Typed:
     _typeof = None
     value = None
 
-    def __init__(self, value, typeof):
-        self._typeof = typeof
-        if not isinstance(value, typeof):
-            raise TypeError(f"Expected {typeof}, got {type(value)}")
+    def __init__(self, value: any, typeof: Optional[type] = None):
+        if typeof is not None:
+            self._typeof = typeof
+            if not _isinstance(value, typeof):
+                raise TypeError(f"Assignment of typed variable: Expected {typeof}, got {type(value)}")
         self.value = value
+        if typeof is None:
+            self._typeof = type(value)
+            warn(
+                f"Typed variable assigned implicitly to {self._typeof}. Consider explicitly defining an expected type.",
+                stacklevel=2
+            )
 
     def __get__(self, instance, owner):
         return self.value
 
-    def __set__(self, instance, value):
-        if not isinstance(value, self._typeof):
-            raise TypeError(f"Expected {self._typeof}, got {type(value)}")
+    def __set__(self, instance, value: any):
+        if not _isinstance(value, self._typeof):
+            raise TypeError(f"Reassignment of typed variable: Expected {self._typeof}, got {type(value)}")
         self.value = value
 
     def __str__(self):
