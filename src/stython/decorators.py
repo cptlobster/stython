@@ -3,6 +3,7 @@ import inspect
 from types import NoneType
 
 from stython import STYTHON_REQUIRE_ANNOTATIONS
+from stython.checker import _isinstance
 
 def typecheck(f):
     """Dynamically check type annotations for a class, function, method, or other types.
@@ -22,8 +23,15 @@ def typecheck_function(f):
     :raises TypeError: in case of a type mismatch."""
     @functools.wraps(f)
     def wrapper(*args, **kwargs):
-        # TODO: parse function arguments and check types; need to handle starred arguments properly
+        # bind arguments to function parameters and check their values
+        sig = inspect.signature(f).bind(*args, **kwargs)
+        for k in sig.arguments.keys():
+            v = sig.arguments[k]
+            print(f"{k}: {v}")
+            fail_if_invalid(f, k, v)
+
         result = f(*args, **kwargs)
+        # check that the return type is valid
         fail_if_invalid(f, "return", result)
         return result
     return wrapper
@@ -40,9 +48,9 @@ def check(f, k, v) -> bool:
 
     :raises AttributeError: if a type annotation is missing and `STYTHON_REQUIRE_ANNOTATIONS` is set"""
     if k in f.__annotations__:
-        return isinstance(v, f.__annotations__[k])
+        return _isinstance(v, f.__annotations__[k])
     else:
-        if not isinstance(v, NoneType) and STYTHON_REQUIRE_ANNOTATIONS:
+        if not _isinstance(v, NoneType) and STYTHON_REQUIRE_ANNOTATIONS:
             raise AttributeError(f"no type annotation found for {k}")
         else:
             return True
