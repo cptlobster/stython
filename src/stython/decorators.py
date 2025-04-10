@@ -2,7 +2,7 @@ import functools
 import inspect
 from types import NoneType
 
-from . import *
+from stython import STYTHON_REQUIRE_ANNOTATIONS
 
 def typecheck(f):
     """Dynamically check type annotations for a class, function, method, or other types.
@@ -25,6 +25,7 @@ def typecheck_function(f):
         # TODO: parse function arguments and check types; need to handle starred arguments properly
         result = f(*args, **kwargs)
         fail_if_invalid(f, "return", result)
+        return result
     return wrapper
 
 def check(f, k, v) -> bool:
